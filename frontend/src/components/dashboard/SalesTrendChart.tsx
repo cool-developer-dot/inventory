@@ -93,7 +93,7 @@ export function SalesTrendChart({ className }: SalesTrendChartProps) {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
                 fontSize: 12,
               }}
-              formatter={(value: number) => [`$${value.toLocaleString()}`, 'Sales']}
+              formatter={(value) => [`$${Number(value ?? 0).toLocaleString()}`, 'Sales']}
             />
             <Line
               type="monotone"

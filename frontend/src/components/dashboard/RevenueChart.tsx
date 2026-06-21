@@ -69,7 +69,7 @@ export function RevenueChart({ className }: RevenueChartProps) {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
                 fontSize: 12,
               }}
-              formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
+              formatter={(value) => [`$${Number(value ?? 0).toLocaleString()}`, 'Revenue']}
             />
             <Bar
               dataKey="revenue"
