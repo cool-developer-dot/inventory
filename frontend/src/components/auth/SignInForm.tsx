@@ -1,5 +1,9 @@
+import { useState, type FormEvent } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/hooks/useAuth'
+import { ApiRequestError } from '@/lib/api'
 import { GoogleButton } from './GoogleButton'
 import { FormDivider } from './FormDivider'
 import { FormField } from './FormField'
@@ -7,12 +11,43 @@ import { PasswordField } from './PasswordField'
 import { SubmitButton } from './SubmitButton'
 import { SignUpLink } from './SignUpLink'
 import { AuthFooter } from './AuthFooter'
+import { AuthError } from './AuthError'
 
 interface SignInFormProps {
   className?: string
 }
 
 export function SignInForm({ className }: SignInFormProps) {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { signIn } = useAuth()
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const from = (location.state as { from?: string } | null)?.from ?? '/dashboard'
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setError('')
+    setIsSubmitting(true)
+
+    try {
+      await signIn({ email, password })
+      navigate(from, { replace: true })
+    } catch (err) {
+      if (err instanceof ApiRequestError) {
+        setError(err.message)
+      } else {
+        setError('Unable to sign in. Please check your connection and try again.')
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <div
       className={cn(
@@ -56,17 +91,31 @@ export function SignInForm({ className }: SignInFormProps) {
 
       <FormDivider className="mb-4 sm:mb-5 md:mb-6" />
 
-      <form className="space-y-3.5 sm:space-y-4" onSubmit={(e) => e.preventDefault()}>
+      <AuthError message={error} className="mb-4" />
+
+      <form className="space-y-3.5 sm:space-y-4" onSubmit={handleSubmit}>
         <FormField
           id="email"
+          name="email"
           type="email"
           placeholder="Email Address"
+          autoComplete="email"
+          required
+          disabled={isSubmitting}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           icon={<Mail className="w-[18px] h-[18px]" strokeWidth={1.75} />}
         />
 
         <PasswordField
           id="password"
+          name="password"
           placeholder="Enter Password"
+          autoComplete="current-password"
+          required
+          disabled={isSubmitting}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
 
         <div className="flex justify-end">
@@ -75,12 +124,14 @@ export function SignInForm({ className }: SignInFormProps) {
           </a>
         </div>
 
-        <SubmitButton>
-          Sign In
-          <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
+        <SubmitButton isLoading={isSubmitting}>
+          {isSubmitting ? 'Signing in...' : 'Sign In'}
+          {!isSubmitting && (
+            <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          )}
         </SubmitButton>
       </form>
 

@@ -1,14 +1,14 @@
-import { useState } from 'react'
+import { useState, type InputHTMLAttributes } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-interface PasswordFieldProps {
+interface PasswordFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   id?: string
   placeholder?: string
   className?: string
 }
 
-export function PasswordField({ id, placeholder = '••••••••', className }: PasswordFieldProps) {
+export function PasswordField({ id, placeholder = '••••••••', className, ...props }: PasswordFieldProps) {
   const [visible, setVisible] = useState(false)
 
   return (
@@ -38,8 +38,10 @@ export function PasswordField({ id, placeholder = '••••••••', cl
           'text-sm sm:text-[0.9375rem]',
           'focus:border-navy-600 focus:ring-2 focus:ring-navy-600/10',
           'outline-none transition-all duration-200',
+          'disabled:opacity-60 disabled:cursor-not-allowed',
           className,
         )}
+        {...props}
       />
       <button
         type="button"

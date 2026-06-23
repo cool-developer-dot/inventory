@@ -5,12 +5,15 @@ import { cn } from '@/lib/utils'
 interface SubmitButtonProps {
   className?: string
   children?: ReactNode
+  disabled?: boolean
+  isLoading?: boolean
 }
 
-export function SubmitButton({ className, children }: SubmitButtonProps) {
+export function SubmitButton({ className, children, disabled, isLoading }: SubmitButtonProps) {
   return (
     <button
       type="submit"
+      disabled={disabled || isLoading}
       className={cn(
         'w-full flex items-center justify-center gap-2 sm:gap-2.5',
         'px-5 sm:px-6 py-3 sm:py-3.5',
@@ -22,6 +25,7 @@ export function SubmitButton({ className, children }: SubmitButtonProps) {
         'active:scale-[0.99]',
         'transition-all duration-200',
         'cursor-pointer',
+        'disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-navy-800 disabled:hover:shadow-sm disabled:active:scale-100',
         className,
       )}
     >
